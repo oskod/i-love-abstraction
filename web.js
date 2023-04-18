@@ -30,19 +30,31 @@ class Route {
 	}
 
 	handleRequest(routePath, req, res) {
+		console.log(routePath);
 		const method = req.method;
 		const foundStarter = this.routes["*"];
 
-		if (foundStarter && foundStarter.handleRequest([], req, res) !== true) {
-			return;
+		if (foundStarter) {
+			const foundHandler = foundStarter.handlers[req.method];
+
+			if (foundHandler) {
+				if (foundHandler(req, res) !== true) {
+					return;
+				}
+			}
 		}
 
 		if (routePath.length > 0) {
 			const foundRoute = this.routes[routePath[0]];
+			console.log(foundRoute);
 			if (!foundRoute) {
 				const foundEnder = this.routes["**"];
 				if (foundEnder) {
-					return foundEnder.handleRequest([], req, res);
+					const foundHandler = foundEnder.handlers[req.method];
+
+					if (foundHandler) {
+						return foundHandler(req, res);
+					}
 				}
 
 				res.writeHead(404);
@@ -55,6 +67,7 @@ class Route {
 		}
 
 		const foundHandler = this.handlers[method];
+		console.log(method, foundHandler);
 
 		if (!foundHandler) {
 			res.writeHead(404);
@@ -76,7 +89,6 @@ class WebServer {
 			currentServer.handleRequest(req, res);
 		});
 		this.rootRoute = new Route();
-		this.rootRoute.root = true;
 	}
 
 	listen(...args) {
