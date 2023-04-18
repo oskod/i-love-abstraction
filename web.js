@@ -30,7 +30,6 @@ class Route {
 	}
 
 	handleRequest(routePath, req, res) {
-		console.log(routePath);
 		const method = req.method;
 		const foundStarter = this.routes["*"];
 
@@ -46,7 +45,7 @@ class Route {
 
 		if (routePath.length > 0) {
 			const foundRoute = this.routes[routePath[0]];
-			console.log(foundRoute);
+
 			if (!foundRoute) {
 				const foundEnder = this.routes["**"];
 				if (foundEnder) {
@@ -67,7 +66,6 @@ class Route {
 		}
 
 		const foundHandler = this.handlers[method];
-		console.log(method, foundHandler);
 
 		if (!foundHandler) {
 			res.writeHead(404);
@@ -85,6 +83,7 @@ class WebServer {
 
 	constructor(isHttps) {
 		const currentServer = this;
+		
 		this.app = (isHttps ? https : http).createServer(function(req, res) {
 			currentServer.handleRequest(req, res);
 		});
